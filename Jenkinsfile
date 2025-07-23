@@ -48,7 +48,9 @@ pipeline {
          stage('Run docker image') {
             steps {
                 script {
-                    runDockerImage(env.PortNumber, env.DockerHubUser, env.ProjectName, env.ImageTag)
+                   sh """
+                       docker run -d -p ${env.PortNumber} ${env.DockerHubUser}/${env.ProjectName}:${env.ImageTag}
+                   """
                 }
             }
         }
