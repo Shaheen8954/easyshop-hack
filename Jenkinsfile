@@ -44,15 +44,14 @@ pipeline {
                 }
             }
          }
-        post {
-            success {
-                 echo 'Deployment and tests completed successfully!'
-            }
-            failure {
-                    echo 'Deployment or tests failed.'
-                }
-            }
+    }
+    
+    post {
+        success {
+            echo 'Deployment and tests completed successfully!'
+        }
+        failure {
+            echo 'Deployment or tests failed.'
         }
     }
-  }
 }
