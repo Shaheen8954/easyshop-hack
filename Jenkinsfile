@@ -7,8 +7,8 @@ pipeline {
         DockerHubUser = 'shaheen8954'
         ProjectName = 'easyshop-hack'
         ImageTag = "${BUILD_NUMBER}"
-        GITHUB_CREDENTIALS = credentials('github-credentials')
-        GIT_BRANCH = "main"
+        Url = ('https://github.com/Shaheen8954/easyshop-hack.git')
+        Branch = "main"
     }
 
     stages {
@@ -22,7 +22,7 @@ pipeline {
          stage('Clone Repository') {
             steps {
                 script{
-                    clone("https://github.com/Shaheen8954/easyshop-hack.git", "main")
+                    clone(env.Url, env.Branch)
                 }
             }
         }
