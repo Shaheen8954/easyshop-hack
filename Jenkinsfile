@@ -9,7 +9,7 @@ pipeline {
         ImageTag = "${BUILD_NUMBER}"
         Url = ('https://github.com/Shaheen8954/easyshop-hack.git')
         Branch = "main"
-        PortNumber = 3000:3000
+        PortNumber = '3000:3000'
     }
 
     stages {
@@ -45,7 +45,6 @@ pipeline {
                 }
             }
          }
-    }
          stage('Run docker image') {
             steps {
                 script {
@@ -53,6 +52,7 @@ pipeline {
                 }
             }
         }
+    }
     
     post {
         success {
