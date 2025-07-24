@@ -48,7 +48,7 @@ pipeline {
          stage('Run docker image') {
             steps {
                 script {
-                  RunContainer()
+                    RunContainer()
                 }
             }
         }
