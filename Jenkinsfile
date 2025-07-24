@@ -48,11 +48,7 @@ pipeline {
          stage('Run docker image') {
             steps {
                 script {
-                   sh """
-                      docker stop ${env.ProjectName} || true
-                      docker rm -f ${env.ProjectName} || true
-                   """
-                runDockerImage(env.PortNumber, env.DockerHubUser, env.ProjectName, env.ImageTag)
+                  RunContainer()
                 }
             }
         }
