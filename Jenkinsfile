@@ -63,19 +63,4 @@ pipeline {
             echo 'Deployment or tests failed.'
         }
     }
-     post {
-        success {
-            mail to: 'nshaheen488@gmail.com',
-                 subject: 'Testing done',
-                 body: 'Hello, the pipeline finished successfully!',
-                 replyTo: 'nshaheen488@gmail.com'
-        }
-
-        failure {
-            mail to: 'nshaheen488@gmail.com',
-                 subject: 'Pipeline Failed',
-                 body: 'Hello, the pipeline failed. Please check the Jenkins logs.',
-                 replyTo: 'nshaheen488@gmail.com'
-        }
-     }
 }
