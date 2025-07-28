@@ -5,9 +5,6 @@ resource "aws_security_group" "allow_user_bastion" {
     dynamic "ingress" {
         for_each = [
           { description = "port 22 allow", from = 22, to = 22, protocol = "tcp", cidr = ["0.0.0.0/0"] },
-          { description = "port 80 allow", from = 80, to = 80, protocol = "tcp", cidr = ["0.0.0.0/0"] },
-          { description = "port 443 allow", from = 443, to = 443, protocol = "tcp", cidr = ["0.0.0.0/0"] },
-          { description = "port 8080 allow", from = 8080, to = 8080, protocol = "tcp", cidr = ["0.0.0.0/0"] }
         ]
         content { 
             description = ingress.value.description
@@ -68,12 +65,12 @@ resource "aws_iam_instance_profile" "ec2_s3_access" {
 }
 
 resource "aws_instance" "baston_host" {
-    ami                    = local.ubuntu_ami_id  # Using the same AMI as the main EC2 instance
+    ami                    = data.aws_ami.ubuntu.id  # Using data source to fetch latest Ubuntu AMI
     instance_type          = var.instance_type
     key_name               = aws_key_pair.deployer.key_name  # Using the same key pair as main EC2
     vpc_security_group_ids = [aws_security_group.allow_user_bastion.id] 
     subnet_id              = module.vpc.public_subnets[0]
-    user_data              = file("${path.module}/ec2_user_tools.sh")
+    user_data              = file("${path.module}/bastion_user_data.sh")
     iam_instance_profile   = aws_iam_instance_profile.ec2_s3_access.name 
     tags = {
         Name = "Bastion-Host"

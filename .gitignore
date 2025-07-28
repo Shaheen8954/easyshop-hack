@@ -1,5 +1,3 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
 /node_modules
 /.pnp
@@ -112,10 +110,3 @@ secrets.tfvars
 *.tfvars.json
 *.auto.tfvars.json
 
-# CLI configuration files
-.terraformrc
-terraform.rc
-terraform/.terraform
-terraform/.terraform.lock.hcl
-terraform/terraform.tfstate
-terraform/terraform.tfstate.backup
