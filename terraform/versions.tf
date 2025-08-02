@@ -4,7 +4,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.0"  # Using a stable 5.x version that satisfies all modules
+      version = "~> 5.0" # Using a stable 5.x version that satisfies all modules
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
@@ -27,11 +27,11 @@ terraform {
 
 provider "aws" {
   region = local.region
-  
+
   # Uncomment and configure these if needed for your AWS setup
   # shared_credentials_files = ["~/.aws/credentials"]
   # profile                 = "default"
-  
+
   # Default tags for all resources
   default_tags {
     tags = local.tags

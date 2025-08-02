@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Update system and install required packages
+sudo apt update
+sudo apt install -y unzip curl
+
 # Install AWS CLI v2
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
@@ -17,4 +21,7 @@ sudo mv /tmp/eksctl /usr/local/bin
 
 # Clean up
 sudo apt-get autoremove -y
-sudo apt-get clean 
+sudo apt-get clean
+
+# Create a log file for debugging
+echo "Bastion host setup completed at $(date)" > /var/log/bastion-setup.log 

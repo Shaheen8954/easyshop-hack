@@ -1,39 +1,26 @@
-# Using data source to fetch the latest Ubuntu 22.04 LTS AMI
-data "aws_ami" "ubuntu" {
+data "aws_ami" "os_image" {
+  owners      = ["099720109477"]
   most_recent = true
-  owners      = ["099720109477"] # Canonical
-
+  filter {
+    name   = "state"
+    values = ["available"]
+  }
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-
-  filter {
-    name   = "architecture"
-    values = ["x86_64"]
-  }
-
-  filter {
-    name   = "root-device-type"
-    values = ["ebs"]
+    values = ["ubuntu/images/hvm-ssd-gp3/*24.04-amd64*"]
   }
 }
 
-# Generate a new RSA key pair if it doesn't exist
+# Generate private key
 resource "tls_private_key" "ec2_key" {
   algorithm = "RSA"
   rsa_bits  = 4096
 }
 
-# Save the private key locally
+# Save private key to local file
 resource "local_file" "private_key" {
-  content         = tls_private_key.ec2_key.private_key_pem
-  filename        = "${path.module}/ec2_key.pem"
+  content  = tls_private_key.ec2_key.private_key_pem
+  filename = "${path.module}/ec2_key.pem"
   file_permission = "0400"
 }
 
@@ -48,32 +35,57 @@ resource "aws_key_pair" "deployer" {
   }
 }
 
-# Output the private key (for reference, though it's sensitive)
-output "private_key" {
-  value     = tls_private_key.ec2_key.private_key_pem
-  sensitive = true
+# IAM role for Jenkins instance to access EKS
+resource "aws_iam_role" "jenkins_role" {
+  name = "jenkins-eks-access-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      }
+    ]
+  })
 }
 
-# Output instructions
-data "external" "example" {
-  program = ["echo", "{}"]
+# IAM policy for EKS access
+resource "aws_iam_policy" "eks_access_policy" {
+  name        = "eks-access-policy"
+  description = "Policy to allow EKS cluster access"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "eks:DescribeCluster",
+          "eks:ListClusters",
+          "eks:AccessKubernetesApi",
+          "eks:DescribeNodegroup",
+          "eks:ListNodegroups"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
 }
 
-output "ssh_instructions" {
-  value = <<-EOT
-    To connect to your instance after applying, run:
-    
-    # SSH into the instance using the private key
-    ssh -i ${local_file.private_key.filename} ubuntu@${aws_instance.baston_host.public_dns}
-    
-    Note: The private key has been saved to: ${local_file.private_key.filename}
-  EOT
+# Attach policy to role
+resource "aws_iam_role_policy_attachment" "jenkins_eks_policy" {
+  role       = aws_iam_role.jenkins_role.name
+  policy_arn = aws_iam_policy.eks_access_policy.arn
+}
 
-  # Only show this output after apply
-  depends_on = [aws_instance.baston_host]
-
-  # Mark as sensitive since it contains instance DNS which might be considered sensitive
-  sensitive = true
+# Instance profile for Jenkins
+resource "aws_iam_instance_profile" "jenkins_profile" {
+  name = "jenkins-instance-profile"
+  role = aws_iam_role.jenkins_role.name
 }
 
 
@@ -97,28 +109,28 @@ resource "aws_security_group" "allow_user_to_connect" {
     }
   }
 
-
   egress {
-    description = "allow all outgoing traffic"
+    description = " allow all outgoing traffic "
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+
   tags = {
     Name = "mysecurity"
   }
 }
 
-
 resource "aws_instance" "testinstance" {
-  ami                    = data.aws_ami.ubuntu.id
+  ami                    = data.aws_ami.os_image.id
   instance_type          = var.instance_type
   key_name               = aws_key_pair.deployer.key_name
+  iam_instance_profile   = aws_iam_instance_profile.jenkins_profile.name
   vpc_security_group_ids = [aws_security_group.allow_user_to_connect.id]
   subnet_id              = module.vpc.public_subnets[0]
-  user_data              = file("${path.module}/ec2_user_tools.sh")
+  user_data              = file("${path.module}/install_tools.sh")
   tags = {
     Name = "Jenkins-Automate"
   }
@@ -126,8 +138,8 @@ resource "aws_instance" "testinstance" {
     volume_size = 20
     volume_type = "gp3"
   }
-}
 
+}
 
 resource "aws_eip" "jenkins_server_ip" {
   instance = aws_instance.testinstance.id
