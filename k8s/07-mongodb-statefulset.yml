@@ -30,12 +30,7 @@ spec:
           limits:
             memory: "512Mi"
             cpu: "512m"
-  volumeClaimTemplates:
-  - metadata:
-      name: mongodb-data
-    spec:
-      accessModes: ["ReadWriteOnce"]
-      storageClassName: "manual"
-      resources:
-        requests:
-          storage: 1Gi
+      volumes:
+      - name: mongodb-data
+        persistentVolumeClaim:
+          claimName: mongodb-pvc

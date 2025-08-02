@@ -4,6 +4,7 @@ metadata:
   name: easyshop-service
   namespace: easyshop-hack
 spec: 
+  type: NodePort
   selector:
     app: easyshop
   ports: 
