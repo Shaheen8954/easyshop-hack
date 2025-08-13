@@ -19,6 +19,22 @@ rm kubectl
 curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
 sudo mv /tmp/eksctl /usr/local/bin
 
+# Helm installation
+sudo snap install helm --classic
+
+# Configure AWS CLI to use instance metadata service
+mkdir -p /home/ubuntu/.aws
+cat > /home/ubuntu/.aws/config << EOF
+[default]
+region = eu-west-1
+output = json
+cli_pager =
+EOF
+
+# Set proper permissions for AWS config
+chown -R ubuntu:ubuntu /home/ubuntu/.aws
+chmod 600 /home/ubuntu/.aws/config
+
 # Clean up
 sudo apt-get autoremove -y
 sudo apt-get clean

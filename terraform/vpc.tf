@@ -1,16 +1,18 @@
 
 module "vpc" {
+
   source  = "terraform-aws-modules/vpc/aws"
   version = "5.8.1" # Using a version compatible with AWS provider 5.x
 
   # Local variables are into provider.tf
 
-  name = local.name
-  cidr = local.vpc_cidr
-
+  name            = local.name
+  cidr            = local.vpc_cidr
   azs             = local.azs
   private_subnets = local.private_subnets
   public_subnets  = local.public_subnets
+   intra_subnets  = local.intra_subnets
+   
 
   enable_nat_gateway     = true
   single_nat_gateway     = true

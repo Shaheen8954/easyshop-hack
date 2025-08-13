@@ -4,13 +4,23 @@ metadata:
   name: easyshop-ingress
   namespace: easyshop-hack 
   annotations: 
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
-    kubernetes.io/ingress.class: "nginx"
-    # Disable SSL redirect for local development
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/certificate-arn: ${acm_certificate_arn}
+    alb.ingress.kubernetes.io/group.name: easyshop-app-lb
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/backend-protocol: HTTP
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}, {"HTTPS":443}]'
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+    alb.ingress.kubernetes.io/healthcheck-path: /
+    alb.ingress.kubernetes.io/healthcheck-port: '3000'
 spec: 
+  ingressClassName: alb
+  tls:
+  - hosts:
+    - shaheen.homes
+    secretName: easyshop-tls
   rules: 
-  - host: localhost
+  - host: shaheen.homes
     http: 
       paths: 
       - path: /
