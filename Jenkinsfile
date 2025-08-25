@@ -11,16 +11,6 @@ pipeline {
         Branch = "main"
         PortNumber = '3000:3000'
     }
- #   stage('Run docker image') {
-  #          steps {
-   #             script {
-    #                sh "docker build -t $("
-     #               sh "docker compose up -d"
-      #          }
-       #     }
-#        }
- #   }
- 
 
     stages {
         stage('Cleanup Workspace') {
