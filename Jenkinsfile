@@ -10,15 +10,16 @@ pipeline {
         Url = ('https://github.com/Shaheen8954/easyshop-hack.git')
         Branch = "main"
         PortNumber = '3000:3000'
-    } stage('Run docker image') {
-            steps {
-                script {
-                    sh "docker build -t $("
-                    sh "docker compose up -d"
-                }
-            }
-        }
     }
+ #   stage('Run docker image') {
+  #          steps {
+   #             script {
+    #                sh "docker build -t $("
+     #               sh "docker compose up -d"
+      #          }
+       #     }
+#        }
+ #   }
  
 
     stages {
@@ -43,17 +44,17 @@ pipeline {
                 }
             }
         }
-    #     stage('Push Docker Image') {
-     #        parallel {
-        #         stage('Push to Docker Hub') {
-         #            steps {
-           #             script {
-            #                dockerpush(env.DockerHubUser, env.ProjectName, env.ImageTag)
-             #           }
-              #       }
-               # }
-         #   }
-     #    }
+         stage('Push Docker Image') {
+             parallel {
+                 stage('Push to Docker Hub') {
+                     steps {
+                        script {
+                            dockerpush(env.DockerHubUser, env.ProjectName, env.ImageTag)
+                        }
+                     }
+                }
+            }
+        }
            
     post {
         success {
