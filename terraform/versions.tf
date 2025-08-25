@@ -29,8 +29,8 @@ terraform {
   }
 }
 
-provider "aws" {
-  region = local.region
+ provider "aws" {
+   region = local.region
 
   # Uncomment and configure these if needed for your AWS setup
   # shared_credentials_files = ["~/.aws/credentials"]
