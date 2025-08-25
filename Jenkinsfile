@@ -50,9 +50,9 @@ pipeline {
            success {
             echo 'Deployment and tests completed successfully!'
         }
-        failure {
+           failure {
             echo 'Deployment or tests failed.'
         }
      }
-  }
+ }
 }
