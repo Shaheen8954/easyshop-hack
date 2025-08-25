@@ -52,7 +52,8 @@ pipeline {
         }
            failure {
             echo 'Deployment or tests failed.'
+            echo 'ho gya bro'
         }
      }
- }
+  } 
 }
