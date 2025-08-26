@@ -58,6 +58,18 @@ pipeline {
                 }
             }
         }
+
+         stage('Push Migration Image') {
+            parallel {
+                stage('Push to Docker Hub') {
+                    steps {
+                        script {
+                            dockerpush(env.DockerHubUser, env.Migration_Image_Name, env.ImageTag)
+                        }
+                    }
+                }
+            }
+        }
     }
     
     post { 
