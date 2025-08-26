@@ -3,6 +3,9 @@ kind: Service
 metadata:  
   name: easyshop-service
   namespace: easyshop-hack
+  annotations:
+    alb.ingress.kubernetes.io/healthcheck-path: /api/health
+    alb.ingress.kubernetes.io/healthcheck-port: '3000'
 spec: 
   type: NodePort
   selector:
