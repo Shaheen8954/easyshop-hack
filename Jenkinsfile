@@ -15,44 +15,47 @@ pipeline {
     stages {
         stage('Cleanup Workspace') {
             steps {
-               script {
-                   cleanWs()
-               }
+                script {
+                    cleanWs()
+                }
             }
         }
-         stage('Clone Repository') {
+        
+        stage('Clone Repository') {
             steps {
-                script{
+                script {
                     clone(env.Url, env.Branch)
                 }
             }
         }
-         stage('Build image') {
+        
+        stage('Build image') {
             steps {
                 script {
                     dockerbuild(env.DockerHubUser, env.ProjectName, env.ImageTag)
                 }
             }
         }
-         stage('Push Docker Image') {
-             parallel {
-                 stage('Push to Docker Hub') {
-                     steps {
+        
+        stage('Push Docker Image') {
+            parallel {
+                stage('Push to Docker Hub') {
+                    steps {
                         script {
                             dockerpush(env.DockerHubUser, env.ProjectName, env.ImageTag)
                         }
-                     }
+                    }
                 }
             }
         }
-         post { 
-             success { 
-                 echo 'Deployment and tests completed successfully!' 
-         } 
-             failure { 
-                 echo 'Deployment or tests failed.' echo 'ho gya bro'
-             }
-         }  
-        
-     } 
+    }
+    
+    post { 
+        success { 
+            echo 'Deployment and tests completed successfully!'
+        } 
+        failure { 
+            echo 'Deployment or tests failed. ho gya bro'
+        }
+    }  
 }
