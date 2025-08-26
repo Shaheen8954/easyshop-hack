@@ -5,7 +5,7 @@ metadata:
   namespace: easyshop-hack 
   annotations: 
     alb.ingress.kubernetes.io/scheme: internet-facing
-    alb.ingress.kubernetes.io/certificate-arn: ${acm_certificate_arn}
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:eu-west-1:850701857037:certificate/25769605-91de-41c0-9347-c888f0710c45
     alb.ingress.kubernetes.io/group.name: easyshop-app-lb
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/backend-protocol: HTTP
@@ -13,14 +13,10 @@ metadata:
     alb.ingress.kubernetes.io/ssl-redirect: '443'
     alb.ingress.kubernetes.io/healthcheck-path: /
     alb.ingress.kubernetes.io/healthcheck-port: '3000'
+    kubernetes.io/ingress.class: alb
 spec: 
-  ingressClassName: alb
-  tls:
-  - hosts:
-    - shaheen.homes
-    secretName: easyshop-tls
   rules: 
-  - host: shaheen.homes
+  - host: easyshop.shaheen.homes
     http: 
       paths: 
       - path: /
