@@ -59,7 +59,7 @@ pipeline {
             }
         }
 
-         stage('Push Migration Image') {
+        stage('Push Migration Image') {
             parallel {
                 stage('Push to Docker Hub') {
                     steps {
