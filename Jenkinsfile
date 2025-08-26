@@ -46,14 +46,6 @@ pipeline {
             }
         }
            
-         post {
-           success {
-            echo 'Deployment and tests completed successfully!'
-          }
-           failure {
-            echo 'Deployment or tests failed.'
-            echo 'ho gya bro'
-        }
-     }
+        
   } 
 }
