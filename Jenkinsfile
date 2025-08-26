@@ -7,6 +7,7 @@ pipeline {
         DockerHubUser = 'shaheen8954'
         ProjectName = 'easyshop-hack'
         ImageTag = "${BUILD_NUMBER}"
+        Migration_Image_Name = 'easyshop-backend'
         Url = ('https://github.com/Shaheen8954/easyshop-hack.git')
         Branch = "main"
         PortNumber = '3000:3000'
@@ -36,6 +37,15 @@ pipeline {
                 }
             }
         }
+
+        stage('Build Migration image') {
+            steps {
+                script {
+                    dockerbuild(env.DockerHubUser, env.Migration_Image_Name, env.ImageTag)
+                }
+            }
+        }
+        
         
         stage('Push Docker Image') {
             parallel {
