@@ -1,0 +1,36 @@
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Native build tools (in case any deps require compile)
+RUN apk add --no-cache python3 make g++
+
+# Install only dependencies based on lockfile
+COPY package*.json tsconfig.json ./
+RUN npm ci
+
+# Copy only what we need for migrations
+COPY scripts ./scripts
+COPY .db ./.db
+# We'll copy the entire project root so relative paths resolve
+COPY . .
+
+# We are using ts-node at runtime, so no TS compile step is required
+# If you prefer running compiled JS, you can add a compile step and change CMD accordingly
+
+# Runtime stage
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+# Copy runtime deps and code
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/scripts ./scripts
+# Copy db assets if present
+COPY --from=builder /app/.db ./.db
+
+# Run the migration using ts-node
+CMD ["npx", "ts-node", "scripts/migrate-data.ts"]

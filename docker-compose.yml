@@ -1,0 +1,122 @@
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: easyshop-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - easyshop-network
+
+  easyshop-backend:
+    build:
+      context: .
+      dockerfile: scripts/Dockerfile-backend
+    container_name: easyshop-backend
+    env_file:
+      - .env.local
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - easyshop-network
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: easyshop-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - easyshop-network
+
+  easyshop-frontend:
+    container_name: easyshop-frontend
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - MONGODB_URI=mongodb://mongodb:27017/easyshop
+        - REDIS_URI=redis://redis:6379
+        - NEXTAUTH_URL=http://easyshop.shaheen.homes https://easyshop.shaheen.homes
+        - NEXT_PUBLIC_API_URL=http://easyshop.shaheen.homes/api https://easyshop.shaheen.homes/api
+        - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+        - JWT_SECRET=${JWT_SECRET}
+        - NODE_ENV=production
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/easyshop
+      - REDIS_URI=redis://redis:6379
+      - NEXTAUTH_URL=http://easyshop.shaheen.homes https://easyshop.shaheen.homes
+      - NEXT_PUBLIC_API_URL=http://easyshop.shaheen.homes/api https://easyshop.shaheen.homes/api
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - JWT_SECRET=${JWT_SECRET}
+      - NODE_ENV=production
+    env_file:
+      - .env.local
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000', r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    depends_on:
+      easyshop-backend:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    networks:
+      - easyshop-network
+    restart: unless-stopped  
+
+  nginx: 
+    image: nginx:1.25-alpine
+    container_name: easyshop-nginx
+    ports:
+      - "801:80"
+      - "443:443"
+    depends_on:
+      easyshop-frontend:
+        condition: service_healthy
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - easyshop-network
+    restart: unless-stopped 
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  certbot:
+    image: certbot/certbot:latest
+    container_name: easyshop-certbot
+    volumes:
+      - ./letsencript:/etc/letsencript
+      - ./certbot/www:/var/www/certbot
+    command: certonly --webroot --webroot-path=/var/www/certbot --email nshaheen488@gmail.com --agree-tos --no-eff-email -d chattingo.shaheen.homes
+
+
+networks:
+  easyshop-network:
+    name: easyshop-network
+
+volumes:
+  mongodb_data:
+    name: mongodb_data
+  redis_data:
+    name: redis_data

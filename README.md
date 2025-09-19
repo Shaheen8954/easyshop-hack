@@ -115,7 +115,7 @@ This guide will help you run EasyShop using Docker containers. No local Node.js 
 
 ### Step 1: Environment Setup
 
-1. Create a file named `.env.local` in the root directory with the following content:
+1. Copy `.env.local` into `.env` in the root directory with the following content:
 ```env
 # Database Configuration
 MONGODB_URI=mongodb://easyshop-mongodb:27017/easyshop
