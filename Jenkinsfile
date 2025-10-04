@@ -1,4 +1,3 @@
-
 @Library('Shared@main') _
 
 pipeline {
@@ -74,7 +73,16 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
+                    withCredentials([
+                        string(credentialsId: 'NEXTAUTH_SECRET_ID', variable: 'NEXTAUTH_SECRET'),
+                        string(credentialsId: 'JWT_SECRET_ID', variable: 'JWT_SECRET')
+                    ]) {
                         sh '''
+                            # Create a deployment env file populated from Jenkins credentials
+                            echo "Writing deployment env file (.env.deploy)"
+                            printf "NEXTAUTH_SECRET=%s\n" "$NEXTAUTH_SECRET" > .env.deploy
+                            printf "JWT_SECRET=%s\n" "$JWT_SECRET" >> .env.deploy
+
                             # Stop all containers
                             docker compose down || true
 
@@ -87,7 +95,8 @@ pipeline {
                         '''
                     }
                 }
-          }
+            }
+        }
     }
 
     post { 

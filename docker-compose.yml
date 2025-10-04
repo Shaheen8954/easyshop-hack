@@ -87,8 +87,8 @@ services:
     image: nginx:1.25-alpine
     container_name: easyshop-nginx
     ports:
-      - "80:80"
-      - "443:443"
+      - "8082:80"
+      - "8443:443"
     depends_on:
       easyshop-frontend:
         condition: service_healthy
