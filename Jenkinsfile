@@ -1,3 +1,4 @@
+
 @Library('Shared@main') _
 
 pipeline {
@@ -88,14 +89,14 @@ pipeline {
                     }
                 }
           }
-    
-        post { 
-            success { 
-                echo 'Deployment and tests completed successfully!'
-            } 
-            failure { 
-                echo 'Deployment or tests failed. ho gya bro'
-            }
+    }
+
+    post { 
+        success { 
+            echo 'Deployment and tests completed successfully!'
+        } 
+        failure { 
+            echo 'Deployment or tests failed. ho gya bro'
         }
-    }  
+    }
 }
