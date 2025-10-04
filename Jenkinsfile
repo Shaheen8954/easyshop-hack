@@ -1,3 +1,4 @@
+
 @Library('Shared@main') _
 
 pipeline {
@@ -10,7 +11,6 @@ pipeline {
         Migration_Image_Name = 'easyshop-backend'
         Url = ('https://github.com/Shaheen8954/easyshop-hack.git')
         Branch = "main"
-        PortNumber = '3000:3000'
     }
 
     stages {
