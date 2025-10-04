@@ -70,14 +70,32 @@ pipeline {
                 }
             }
         }
-    }
+
+        stage('Deploy') {
+            steps {
+                script {
+                        sh '''
+                            # Stop all containers
+                            docker compose down || true
+
+                            # Ensure latest images for provided tags
+                            docker compose pull || true
+                            
+                            # Deploy with updated docker-compose.yml
+                            docker compose up -d
+                            echo "Deployment completed!"
+                        '''
+                    }
+                }
+          }
     
-    post { 
-        success { 
-            echo 'Deployment and tests completed successfully!'
-        } 
-        failure { 
-            echo 'Deployment or tests failed. ho gya bro'
+        post { 
+            success { 
+                echo 'Deployment and tests completed successfully!'
+            } 
+            failure { 
+                echo 'Deployment or tests failed. ho gya bro'
+            }
         }
     }  
 }
