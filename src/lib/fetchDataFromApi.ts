@@ -17,14 +17,16 @@ export const axiosInstance = axios.create({
 // Add request interceptor to include token from cookie
 axiosInstance.interceptors.request.use(
   async (config) => {
-    // Get token from cookie
-    const cookies = document.cookie.split(';');
-    const tokenCookie = cookies.find(cookie => cookie.trim().startsWith('token='));
-    const token = tokenCookie ? tokenCookie.split('=')[1] : null;
+    // Only attempt to read cookies in the browser
+    if (typeof window !== 'undefined') {
+      const cookies = document.cookie.split(';');
+      const tokenCookie = cookies.find(cookie => cookie.trim().startsWith('token='));
+      const token = tokenCookie ? tokenCookie.split('=')[1] : null;
 
-    // If token exists, add it to headers
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
+      // If token exists, add it to headers
+      if (token) {
+        config.headers['Authorization'] = `Bearer ${token}`;
+      }
     }
 
     return config;
