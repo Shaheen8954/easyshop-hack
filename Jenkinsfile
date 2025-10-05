@@ -74,14 +74,14 @@ pipeline {
             steps {
                 script {
                     withCredentials([
-                        string(credentialsId: 'NEXTAUTH_SECRET_ID', variable: 'NEXTAUTH_SECRET'),
-                        string(credentialsId: 'JWT_SECRET_ID', variable: 'JWT_SECRET')
+                        string(credentialsId: 'NEXTAUTH_SECRET', variable: 'NEXTAUTH_SECRET'),
+                        string(credentialsId: 'JWT_SECRET', variable: 'JWT_SECRET')
                     ]) {
                         sh '''
                             # Create a deployment env file populated from Jenkins credentials
-                            echo "Writing deployment env file (.env.deploy)"
-                            printf "NEXTAUTH_SECRET=%s\n" "$NEXTAUTH_SECRET" > .env.deploy
-                            printf "JWT_SECRET=%s\n" "$JWT_SECRET" >> .env.deploy
+                            echo "Writing deployment env file (.env)"
+                            printf "NEXTAUTH_SECRET=%s\n" "$NEXTAUTH_SECRET" > .env
+                            printf "JWT_SECRET=%s\n" "$JWT_SECRET" >> .env
 
                             # Stop all containers
                             docker compose down || true
