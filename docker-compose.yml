@@ -58,11 +58,13 @@ services:
         - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
         - JWT_SECRET=${JWT_SECRET}
         - NODE_ENV=production
+        - INTERNAL_API_URL=http://localhost:3000/api
     environment:
       - MONGODB_URI=mongodb://mongodb:27017/easyshop
       - REDIS_URI=redis://redis:6379
       - NEXTAUTH_URL=https://easyshop-hack.shaheen.homes
       - NEXT_PUBLIC_API_URL=https://easyshop-hack.shaheen.homes/api
+      - INTERNAL_API_URL=http://localhost:3000/api
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
       - JWT_SECRET=${JWT_SECRET}
       - NODE_ENV=production
@@ -112,8 +114,7 @@ services:
     volumes:
       - ./letsencrypt:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
-    entrypoint: sh -c "trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --quiet || true; sleep 12h & wait $!; done"
-
+    entrypoint: ["sh", "-c", "trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --quiet || true; sleep 12h; done"]
 
 networks:
   easyshop-network:

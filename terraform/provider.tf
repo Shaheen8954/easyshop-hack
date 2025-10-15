@@ -1,7 +1,7 @@
 # Local variables for the project vpc
 
 locals {
-    region             = "eu-west-1"
+    region             = var.aws_region
     name               = "easyshop-cluster"
     vpc_cidr           = "10.0.0.0/16"
     azs                = ["eu-west-1a", "eu-west-1b"]
@@ -17,5 +17,6 @@ locals {
 }
 
 provider "aws" {
-     region = local.region
+     region  = local.region
+     profile = var.aws_profile
 }
