@@ -84,13 +84,13 @@ pipeline {
                             printf "JWT_SECRET=%s\n" "$JWT_SECRET" >> .env
 
                             # Stop all containers
-                            docker compose down || true
+                            docker-compose down || true
 
                             # Ensure latest images for provided tags
-                            docker compose pull || true
+                            docker-compose pull || true
                             
                             # Deploy with updated docker-compose.yml
-                            docker compose up -d
+                            docker-compose up -d
                             echo "Deployment completed!"
                         '''
                     }
