@@ -12,10 +12,12 @@ spec:
     metadata: 
       name: redis-pod
       namespace: easyshop-hack
+      labels:
+        app: redis
     spec: 
       containers:
       - name: redis
-        image: redis-alpine
+        image: redis:alpine
         ports: 
         - containerPort: 6379
         resources: 
@@ -25,18 +27,17 @@ spec:
           limits:
             memory: "256Mi"
             cpu: "200m"
-            livenessProbe: 
-            httpGet: 
-              exec:
-                command:  
-                - redis-cli
-                - ping
-              initialDelaySeconds: 15
-              periodSeconds: 20
-            readinessProbe:
-              exec:
-                command:
-                - redis-cli
-                - ping
-              initialDelaySeconds: 5
-              periodSeconds: 10
+        livenessProbe: 
+          exec:
+            command:  
+            - redis-cli
+            - ping
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          initialDelaySeconds: 5
+          periodSeconds: 10
