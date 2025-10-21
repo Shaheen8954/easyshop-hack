@@ -6,7 +6,7 @@ metadata:
 spec:
   replicas: 1
   selector:
-    matchlabels: 
+    matchLabels: 
       app: redis 
   template:
     metadata: 
@@ -23,7 +23,7 @@ spec:
             memory: "256Mi"
             cpu: "200m"
           limits:
-            memory: "256"
+            memory: "256Mi"
             cpu: "200m"
             livenessProbe: 
             httpGet: 
@@ -31,7 +31,7 @@ spec:
                 command:  
                 - redis-cli
                 - ping
-              initiasDelaySeconds: 15
+              initialDelaySeconds: 15
               periodSeconds: 20
             readinessProbe:
               exec:
