@@ -55,6 +55,8 @@ services:
         - REDIS_URI=redis://redis:6379
         - NEXTAUTH_URL=https://easyshop-hack.shaheen.homes
         - NEXT_PUBLIC_API_URL=https://easyshop-hack.shaheen.homes/api
+        - NEXTAUTH_URL=https://easyshop.shaheen.homes
+        - NEXT_PUBLIC_API_URL=https://easyshop.shaheen.homes/api
         - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
         - JWT_SECRET=${JWT_SECRET}
         - NODE_ENV=production
@@ -98,6 +100,8 @@ services:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - ./certbot/www:/var/www/certbot
       - ./letsencrypt:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+      - ./letsencrypt:/etc/letsencrypt
     networks:
       - easyshop-network
     restart: unless-stopped 
@@ -112,6 +116,7 @@ services:
     image: certbot/certbot:latest
     container_name: easyshop-certbot
     volumes:
+      - ./letsencrypt:/etc/letsencrypt
       - ./letsencrypt:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
     entrypoint: ["sh", "-c", "trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --quiet || true; sleep 12h; done"]

@@ -32,8 +32,10 @@ module "eks" {
 
   cluster_name                    = local.name
   cluster_version                 = "1.28"
-  cluster_endpoint_public_access  = false
+  cluster_endpoint_public_access  = true
   cluster_endpoint_private_access = true
+  cluster_endpoint_public_access_cidrs = var.cluster_endpoint_public_access_cidrs
+  enable_irsa = true
  
  //access entry for any specific user or role (jenkins controller instance)
  
@@ -44,6 +46,19 @@ module "eks" {
       
       policy_associations = {
         example = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+          access_scope = {
+            type = "cluster"
+          }
+        }
+      }
+    }
+
+    admin = {
+      principal_arn = var.admin_principal_arn
+
+      policy_associations = {
+        admin = {
           policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
           access_scope = {
             type = "cluster"
@@ -90,6 +105,11 @@ module "eks" {
       })
     }
 
+    aws-ebs-csi-driver = {
+      most_recent = true
+      service_account_role_arn = aws_iam_role.ebs_csi_controller.arn
+    }
+
     # aws-load-balancer-controller = {
     #   most_recent = true
     #   service_account_role_arn = aws_iam_role.aws_load_balancer_controller.arn
@@ -105,7 +125,7 @@ module "eks" {
 
   eks_managed_node_group_defaults = {
 
-    instance_types = ["t3.large"]
+    instance_types = ["t3.micro"]
 
     attach_cluster_primary_security_group = true
   }
@@ -121,7 +141,7 @@ module "eks" {
       desired_size = 1
 
 
-      instance_types = ["t3.large"]
+      instance_types = ["t3.micro"]
       capacity_type  = "ON_DEMAND"
 
 
@@ -162,34 +182,34 @@ data "aws_instances" "eks_nodes" {
   depends_on = [module.eks]
 }
 
-# IAM Role for AWS Load Balancer Controller
-# resource "aws_iam_role" "aws_load_balancer_controller" {
-#   name = "aws-load-balancer-controller-role"
+# IRSA role for EBS CSI controller
+resource "aws_iam_role" "ebs_csi_controller" {
+  name = "${local.name}-ebs-csi-controller"
 
-#   assume_role_policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [
-#       {
-#         Action = "sts:AssumeRoleWithWebIdentity"
-#         Effect = "Allow"
-#         Principal = {
-#           Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${replace(module.eks.cluster_oidc_issuer_url, "https://", "")}"
-#         }
-#         Condition = {
-#           StringEquals = {
-#             "${replace(module.eks.cluster_oidc_issuer_url, "https://", "")}:sub" = "system:serviceaccount:kube-system:aws-load-balancer-controller"
-#           }
-#         }
-#       }
-#     ]
-#   })
-# }
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${replace(module.eks.cluster_oidc_issuer_url, "https://", "")}"
+        },
+        Action = "sts:AssumeRoleWithWebIdentity",
+        Condition = {
+          StringEquals = {
+            "${replace(module.eks.cluster_oidc_issuer_url, "https://", "")}:aud" = "sts.amazonaws.com",
+            "${replace(module.eks.cluster_oidc_issuer_url, "https://", "")}:sub" = "system:serviceaccount:kube-system:ebs-csi-controller-sa"
+          }
+        }
+      }
+    ]
+  })
+}
 
-# Attach AWS Load Balancer Controller policy
-# resource "aws_iam_role_policy_attachment" "aws_load_balancer_controller" {
-#   role       = aws_iam_role.aws_load_balancer_controller.name
-#   policy_arn = "arn:aws:iam::aws:policy/AWSLoadBalancerControllerIAMPolicy"
-# }
+resource "aws_iam_role_policy_attachment" "ebs_csi_controller" {
+  role       = aws_iam_role.ebs_csi_controller.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+}
 
 # Get current AWS account ID
 data "aws_caller_identity" "current" {}

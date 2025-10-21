@@ -23,7 +23,6 @@ metadata:
   name: db-migration-job-v2
   namespace: easyshop-hack
 spec:
-  backoffLimit: 2
   template: 
     spec:
       restartPolicy: Never
