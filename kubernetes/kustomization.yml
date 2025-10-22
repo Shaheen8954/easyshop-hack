@@ -2,10 +2,10 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-- 00-priority-class.yaml
+
 - 01-namespace.yaml
 - 02-mongodb-pv.yaml
-# 03-mongodb-pvc.yaml removed - PVC is created by StatefulSet
+- 03-mongodb-pvc.yaml #removed - PVC is created by StatefulSet
 - 04-configmap.yaml
 - 05-secrets.yaml
 - 06-mongodb-service.yaml
