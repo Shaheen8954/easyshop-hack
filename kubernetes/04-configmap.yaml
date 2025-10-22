@@ -6,4 +6,4 @@ metadata:
 data:
   MONGODB_URI: "mongodb://mongodb-service:27017/easyshop"
   NEXTURL: "https://easyshop-hack.shaheen.homes"
-  NEXTAUTH_URL: "https://easyshop-hack.shaheen.homes/api"
+  NEXTAUTH_URL: "https://easyshop-hack.shaheen.homes"
