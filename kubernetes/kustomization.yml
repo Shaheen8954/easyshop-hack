@@ -5,7 +5,7 @@ resources:
 
 - 01-namespace.yaml
 - 02-mongodb-pv.yaml
-- 03-mongodb-pvc.yaml 
+- 03-mongodb-pvc.yml 
 - 04-configmap.yaml
 - 05-secrets.yaml
 - 06-mongodb-service.yaml
